@@ -1,4 +1,4 @@
-import { getLowestPrice, BASE_BOOK_PRICE, getDiscountGroupings, equalizeGroupings, Book } from '.';
+import { getFinalPrice, BASE_BOOK_PRICE, getDiscountGroupings, equalizeGroupings, Book } from '.';
 
 describe('src/index', () => {
     describe('getDiscountGroupings', () => {
@@ -68,70 +68,70 @@ describe('src/index', () => {
         });
     });
 
-    describe('getLowestPrice', () => {
+    describe('getFinalPrice', () => {
         describe('simple cases', () => {
             it('should return 0 when empty input', () => {
-                expect(getLowestPrice([])).toEqual(0);
+                expect(getFinalPrice([])).toEqual(0);
             });
 
             it('should return 8 when input has a 1 length (1)', () => {
-                expect(getLowestPrice([1])).toEqual(BASE_BOOK_PRICE);
+                expect(getFinalPrice([1])).toEqual(BASE_BOOK_PRICE);
             });
 
             it('should return 8 when input has a 1 length (2)', () => {
-                expect(getLowestPrice([2])).toEqual(BASE_BOOK_PRICE);
+                expect(getFinalPrice([2])).toEqual(BASE_BOOK_PRICE);
             });
 
             it('should return 8 when input has a 1 length (3)', () => {
-                expect(getLowestPrice([3])).toEqual(BASE_BOOK_PRICE);
+                expect(getFinalPrice([3])).toEqual(BASE_BOOK_PRICE);
             });
 
             it('should return 8 when input has a 1 length (4)', () => {
-                expect(getLowestPrice([4])).toEqual(BASE_BOOK_PRICE);
+                expect(getFinalPrice([4])).toEqual(BASE_BOOK_PRICE);
             });
 
             it('should return 8 * 3 when input has a 3 length', () => {
-                expect(getLowestPrice([1, 1, 1])).toEqual(BASE_BOOK_PRICE * 3);
+                expect(getFinalPrice([1, 1, 1])).toEqual(BASE_BOOK_PRICE * 3);
             });
         });
 
         describe('simple discounts', () => {
             it('should return a price with a 5% discount', () => {
-                expect(getLowestPrice([0, 1])).toEqual(BASE_BOOK_PRICE * 2 * 0.95);
+                expect(getFinalPrice([0, 1])).toEqual(BASE_BOOK_PRICE * 2 * 0.95);
             });
 
             it('should return a price with a 10% discount', () => {
-                expect(getLowestPrice([0, 2, 4])).toEqual(BASE_BOOK_PRICE * 3 * 0.9);
+                expect(getFinalPrice([0, 2, 4])).toEqual(BASE_BOOK_PRICE * 3 * 0.9);
             });
 
             it('should return a price with a 20% discount', () => {
-                expect(getLowestPrice([0, 1, 2, 4])).toEqual(BASE_BOOK_PRICE * 4 * 0.8);
+                expect(getFinalPrice([0, 1, 2, 4])).toEqual(BASE_BOOK_PRICE * 4 * 0.8);
             });
 
             it('should return a price with a 25% discount', () => {
-                expect(getLowestPrice([0, 1, 2, 3, 4])).toEqual(BASE_BOOK_PRICE * 5 * 0.75);
+                expect(getFinalPrice([0, 1, 2, 3, 4])).toEqual(BASE_BOOK_PRICE * 5 * 0.75);
             });
         });
 
         describe('several discounts', () => {
             it('should return a price with the correct discount (1)', () => {
-                expect(getLowestPrice([0, 0, 1])).toEqual(
+                expect(getFinalPrice([0, 0, 1])).toEqual(
                     BASE_BOOK_PRICE + BASE_BOOK_PRICE * 2 * 0.95,
                 );
             });
 
             it('should return a price with the correct discount (2)', () => {
-                expect(getLowestPrice([0, 0, 1, 1])).toEqual(2 * (BASE_BOOK_PRICE * 2 * 0.95));
+                expect(getFinalPrice([0, 0, 1, 1])).toEqual(2 * (BASE_BOOK_PRICE * 2 * 0.95));
             });
 
             it('should return a price with the correct discount (3)', () => {
-                expect(getLowestPrice([0, 0, 1, 2, 2, 3])).toEqual(
+                expect(getFinalPrice([0, 0, 1, 2, 2, 3])).toEqual(
                     BASE_BOOK_PRICE * 4 * 0.8 + BASE_BOOK_PRICE * 2 * 0.95,
                 );
             });
 
             it('should return a price with the correct discount (4)', () => {
-                expect(getLowestPrice([0, 1, 1, 2, 3, 4])).toEqual(
+                expect(getFinalPrice([0, 1, 1, 2, 3, 4])).toEqual(
                     BASE_BOOK_PRICE + BASE_BOOK_PRICE * 5 * 0.75,
                 );
             });
@@ -139,7 +139,7 @@ describe('src/index', () => {
 
         describe('edge cases', () => {
             it('should return an optimized discounted price (4 + 4)', () => {
-                expect(getLowestPrice([0, 0, 1, 1, 2, 2, 3, 4])).toEqual(
+                expect(getFinalPrice([0, 0, 1, 1, 2, 2, 3, 4])).toEqual(
                     2 * (BASE_BOOK_PRICE * 4 * 0.8),
                 );
             });
@@ -148,7 +148,7 @@ describe('src/index', () => {
                 // (5 + 5 + 5 + 5 + 3) => price is 141.5
                 // (5 + 5 + 5 + 4 + 4) => price is 141.2
                 expect(
-                    getLowestPrice([
+                    getFinalPrice([
                         ...(<Array<Book>>[0, 0, 0, 0, 0]),
                         ...(<Array<Book>>[1, 1, 1, 1, 1]),
                         ...(<Array<Book>>[2, 2, 2, 2]),
@@ -174,7 +174,7 @@ describe('src/index', () => {
                     );
 
                 expect(
-                    getLowestPrice([
+                    getFinalPrice([
                         ...bigPayload,
                         ...(<Array<Book>>[0, 0, 0, 0, 0]),
                         ...(<Array<Book>>[1, 1, 1, 1, 1]),

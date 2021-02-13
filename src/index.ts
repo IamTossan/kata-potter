@@ -1,9 +1,9 @@
 const BASE_BOOK_PRICE = 8;
 const DISCOUNTS = {
-    '2': 1 - 0.05, // 5% discount
-    '3': 1 - 0.1, // 10% discount
-    '4': 1 - 0.2, // 20% discount
-    '5': 1 - 0.25, // 25% discount
+    '2': 5 / 100,
+    '3': 10 / 100,
+    '4': 20 / 100,
+    '5': 25 / 100,
 };
 
 type Book = 0 | 1 | 2 | 3 | 4;
@@ -80,48 +80,43 @@ const getDiscountGroupings = (a: Array<Book>, maxSize: number = 5): Book[][] => 
     return discounts;
 };
 
-const getPrice = (discountGroups: Book[][], totalBookAmount: number) => {
-    const discountedPrice = discountGroups.reduce(
+const getDiscount = (discountGroups: Book[][]) => {
+    return discountGroups.reduce(
         (acc, cur) =>
             acc +
             cur.length * BASE_BOOK_PRICE * DISCOUNTS[String(cur.length) as Exclude<0 | 1, Book>],
         0,
     );
-
-    return (
-        discountedPrice +
-        (totalBookAmount - discountGroups.reduce((acc, cur) => acc + cur.length, 0)) *
-            BASE_BOOK_PRICE
-    );
 };
 
-const getLowestPrice = (a: Array<Book>): number => {
+const getBasePrice = (booksAmount: number) => booksAmount * BASE_BOOK_PRICE;
+
+const getFinalPrice = (a: Array<Book>): number => {
     if (!a.length) {
         return 0;
     }
 
-    const books = [...a].sort();
-
-    if (books.length === 1) {
+    if (a.length === 1) {
         return BASE_BOOK_PRICE;
     }
 
+    const books = [...a].sort();
     const discounts = Object.keys(DISCOUNTS)
         .map(Number)
         .map((maxSize) => {
             const curDiscount = getDiscountGroupings(books, maxSize);
 
             if (!curDiscount.length) {
-                return BASE_BOOK_PRICE * books.length;
+                return getBasePrice(books.length);
             }
             if (curDiscount.length === 1) {
-                return getPrice(curDiscount, books.length);
+                return getBasePrice(books.length) - getDiscount(curDiscount);
             }
 
-            const normalPrice = getPrice(curDiscount, books.length);
-            const modifiedGroupsPrice = getPrice(equalizeGroupings(curDiscount), books.length);
+            const normalDiscount = getDiscount(curDiscount);
+            const modifiedDiscount = getDiscount(equalizeGroupings(curDiscount));
 
-            return Math.min(normalPrice, modifiedGroupsPrice);
+            return getBasePrice(books.length) - Math.max(normalDiscount, modifiedDiscount);
         });
 
     return Math.min(...discounts);
@@ -132,7 +127,7 @@ export {
     Book,
     // main exports
     BASE_BOOK_PRICE,
-    getLowestPrice,
+    getFinalPrice,
     getDiscountGroupings,
     equalizeGroupings,
 };
