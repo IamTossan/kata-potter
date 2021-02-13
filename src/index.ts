@@ -12,9 +12,12 @@ type DiscountGroups = {
 type Book = 0 | 1 | 2 | 3 | 4;
 
 const equalizeGroupings = (groupings: DiscountGroups) => {
-    const groupingsCopy = JSON.parse(JSON.stringify(groupings));
+    const groupingsCopy = Object.assign(
+        { '2': [], '3': [], '4': [], '5': [] },
+        JSON.parse(JSON.stringify(groupings)),
+    );
 
-    if (groupings[3].length && groupings[5].length) {
+    while (groupingsCopy[3].length && groupingsCopy[5].length) {
         const x = groupingsCopy[5].pop();
         const y = groupingsCopy[3].pop();
         for (let i = 0; i < x.length; i += 1) {

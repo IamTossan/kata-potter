@@ -77,6 +77,7 @@ describe('src/index', () => {
             const actualResult = equalizeGroupings(initialInput);
 
             const expectedResult = {
+                '2': [],
                 '3': [],
                 '4': [
                     [0, 1, 3, 4],
@@ -94,6 +95,7 @@ describe('src/index', () => {
         it('should not mutate the input', () => {
             const getBaseInput = (): DiscountGroups => {
                 return {
+                    '2': [],
                     '3': [[0, 1, 3]],
                     '4': [],
                     '5': [
