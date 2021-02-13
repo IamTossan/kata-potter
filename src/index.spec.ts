@@ -1,65 +1,109 @@
-import { getFinalPrice, BASE_BOOK_PRICE, getDiscountGroupings, equalizeGroupings, Book } from '.';
+import {
+    Book,
+    DiscountGroups,
+    BASE_BOOK_PRICE,
+    getFinalPrice,
+    getDiscountGroupings,
+    equalizeGroupings,
+} from '.';
 
 describe('src/index', () => {
     describe('getDiscountGroupings', () => {
         it('should return an empty array', () => {
-            expect(getDiscountGroupings([1, 1, 1])).toEqual([]);
+            expect(getDiscountGroupings([1, 1, 1])).toEqual({
+                '2': [],
+                '3': [],
+                '4': [],
+                '5': [],
+            });
         });
 
         it('should return an array with a book grouping', () => {
-            expect(getDiscountGroupings([0, 1])).toEqual([[0, 1]]);
+            expect(getDiscountGroupings([0, 1])).toEqual({
+                '2': [[0, 1]],
+                '3': [],
+                '4': [],
+                '5': [],
+            });
         });
 
         it('should return an array with a book grouping (with remainder)', () => {
-            expect(getDiscountGroupings([0, 0, 1])).toEqual([[0, 1]]);
+            expect(getDiscountGroupings([0, 0, 1])).toEqual({
+                '2': [[0, 1]],
+                '3': [],
+                '4': [],
+                '5': [],
+            });
         });
 
         it('should return an array with two book grouping (2 + 2)', () => {
-            expect(getDiscountGroupings([0, 0, 1, 1])).toEqual([
-                [0, 1],
-                [0, 1],
-            ]);
+            expect(getDiscountGroupings([0, 0, 1, 1])).toEqual({
+                '2': [
+                    [0, 1],
+                    [0, 1],
+                ],
+                '3': [],
+                '4': [],
+                '5': [],
+            });
         });
 
         it('should return an array with two book grouping (4 + 2)', () => {
-            expect(getDiscountGroupings([0, 0, 1, 2, 2, 3])).toEqual([
-                [0, 1, 2, 3],
-                [0, 2],
-            ]);
+            expect(getDiscountGroupings([0, 0, 1, 2, 2, 3])).toEqual({
+                '2': [[0, 2]],
+                '3': [],
+                '4': [[0, 1, 2, 3]],
+                '5': [],
+            });
         });
     });
 
     describe('equalizeGroupings', () => {
         it('should modify the two last items', () => {
-            const getBaseInput = (): Book[][] => [
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 3],
-            ];
+            const getBaseInput = (): DiscountGroups => {
+                return {
+                    '3': [[0, 1, 3]],
+                    '4': [],
+                    '5': [
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                    ],
+                };
+            };
 
             const initialInput = getBaseInput();
             const actualResult = equalizeGroupings(initialInput);
 
-            const expectedResult = [
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 3, 4],
-                [0, 1, 3, 2],
-            ];
-            expect(actualResult).toEqual(expectedResult);
+            const expectedResult = {
+                '3': [],
+                '4': [
+                    [0, 1, 3, 4],
+                    [0, 1, 3, 2],
+                ],
+                '5': [
+                    [0, 1, 2, 3, 4],
+                    [0, 1, 2, 3, 4],
+                    [0, 1, 2, 3, 4],
+                ],
+            };
+            expect(actualResult).toStrictEqual(expectedResult);
         });
 
         it('should not mutate the input', () => {
-            const getBaseInput = (): Book[][] => [
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 2, 3, 4],
-                [0, 1, 3],
-            ];
+            const getBaseInput = (): DiscountGroups => {
+                return {
+                    '3': [[0, 1, 3]],
+                    '4': [],
+                    '5': [
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                        [0, 1, 2, 3, 4],
+                    ],
+                };
+            };
 
             const initialInput = getBaseInput();
             equalizeGroupings(initialInput);
