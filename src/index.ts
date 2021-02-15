@@ -33,7 +33,7 @@ const equalizeGroupings = (groupings: DiscountGroups) => {
     return groupingsCopy;
 };
 
-const getDiscountGroupings = (a: Array<Book>, maxSize: number = 5): DiscountGroups => {
+const getDiscountGroupings = (a: Array<Book>): DiscountGroups => {
     const discounts: DiscountGroups = { '2': [], '3': [], '4': [], '5': [] };
 
     const uniqA = [...new Set(a)];
@@ -58,9 +58,6 @@ const getDiscountGroupings = (a: Array<Book>, maxSize: number = 5): DiscountGrou
             if (!curDiscount.includes(pool[i])) {
                 curDiscount.push(pool[i]);
                 selectedValues.push(pool[i]);
-            }
-            if (selectedValues.length === maxSize) {
-                break;
             }
         }
 
@@ -103,20 +100,14 @@ const getFinalPrice = (a: Array<Book>): number => {
     const basePrice = getBasePrice(a.length);
 
     if (a.length === 1) {
-        return BASE_BOOK_PRICE;
+        return basePrice;
     }
 
     const books = [...a].sort();
-    const discounts = Object.keys(DISCOUNTS)
-        .map(Number)
-        .map((maxSize) => {
-            const curDiscount = getDiscountGroupings(books, maxSize);
-            const discount = getDiscount(equalizeGroupings(curDiscount));
+    const curDiscount = getDiscountGroupings(books);
+    const discount = getDiscount(equalizeGroupings(curDiscount));
 
-            return basePrice - discount;
-        });
-
-    return Math.min(...discounts);
+    return basePrice - discount;
 };
 
 export {
