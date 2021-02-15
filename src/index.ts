@@ -1,3 +1,5 @@
+import { pipe, sort } from './utils';
+
 const BASE_BOOK_PRICE = 8;
 const DISCOUNTS: { [i: number]: number } = {
     2: 5 / 100,
@@ -90,9 +92,7 @@ const getFinalPrice = (a: Array<Book>): number => {
         return basePrice;
     }
 
-    const books = [...a].sort();
-    const curDiscount = getBookGroupings(books);
-    const discount = getDiscount(equalizeGroupings(curDiscount));
+    const discount = pipe(sort, getBookGroupings, equalizeGroupings, getDiscount)([...a]);
 
     return basePrice - discount;
 };
