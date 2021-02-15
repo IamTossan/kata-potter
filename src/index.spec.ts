@@ -1,16 +1,17 @@
 import {
     Book,
-    DiscountGroups,
+    BookGroupings,
     BASE_BOOK_PRICE,
     getFinalPrice,
-    getDiscountGroupings,
+    getBookGroupings,
     equalizeGroupings,
 } from '.';
 
 describe('src/index', () => {
-    describe('getDiscountGroupings', () => {
+    describe('getBookGroupings', () => {
         it('should return an empty array', () => {
-            expect(getDiscountGroupings([1, 1, 1])).toEqual({
+            expect(getBookGroupings([1, 1, 1])).toEqual({
+                '1': [[1], [1], [1]],
                 '2': [],
                 '3': [],
                 '4': [],
@@ -19,7 +20,8 @@ describe('src/index', () => {
         });
 
         it('should return an array with a book grouping', () => {
-            expect(getDiscountGroupings([0, 1])).toEqual({
+            expect(getBookGroupings([0, 1])).toEqual({
+                '1': [],
                 '2': [[0, 1]],
                 '3': [],
                 '4': [],
@@ -28,7 +30,8 @@ describe('src/index', () => {
         });
 
         it('should return an array with a book grouping (with remainder)', () => {
-            expect(getDiscountGroupings([0, 0, 1])).toEqual({
+            expect(getBookGroupings([0, 0, 1])).toEqual({
+                '1': [[0]],
                 '2': [[0, 1]],
                 '3': [],
                 '4': [],
@@ -37,7 +40,8 @@ describe('src/index', () => {
         });
 
         it('should return an array with two book grouping (2 + 2)', () => {
-            expect(getDiscountGroupings([0, 0, 1, 1])).toEqual({
+            expect(getBookGroupings([0, 0, 1, 1])).toEqual({
+                '1': [],
                 '2': [
                     [0, 1],
                     [0, 1],
@@ -49,7 +53,8 @@ describe('src/index', () => {
         });
 
         it('should return an array with two book grouping (4 + 2)', () => {
-            expect(getDiscountGroupings([0, 0, 1, 2, 2, 3])).toEqual({
+            expect(getBookGroupings([0, 0, 1, 2, 2, 3])).toEqual({
+                '1': [],
                 '2': [[0, 2]],
                 '3': [],
                 '4': [[0, 1, 2, 3]],
@@ -60,8 +65,9 @@ describe('src/index', () => {
 
     describe('equalizeGroupings', () => {
         it('should modify the two last items', () => {
-            const getBaseInput = (): DiscountGroups => {
+            const getBaseInput = (): BookGroupings => {
                 return {
+                    '1': [],
                     '3': [[0, 1, 3]],
                     '4': [],
                     '5': [
@@ -77,6 +83,7 @@ describe('src/index', () => {
             const actualResult = equalizeGroupings(initialInput);
 
             const expectedResult = {
+                '1': [],
                 '2': [],
                 '3': [],
                 '4': [
@@ -93,8 +100,9 @@ describe('src/index', () => {
         });
 
         it('should not mutate the input', () => {
-            const getBaseInput = (): DiscountGroups => {
+            const getBaseInput = (): BookGroupings => {
                 return {
+                    '1': [],
                     '2': [],
                     '3': [[0, 1, 3]],
                     '4': [],

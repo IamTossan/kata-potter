@@ -6,14 +6,14 @@ const DISCOUNTS: { [i: number]: number } = {
     5: 25 / 100,
 };
 
-type DiscountGroups = {
+type BookGroupings = {
     [i: string]: Book[][];
 };
 type Book = 0 | 1 | 2 | 3 | 4;
 
-const equalizeGroupings = (groupings: DiscountGroups) => {
+const equalizeGroupings = (groupings: BookGroupings) => {
     const groupingsCopy = Object.assign(
-        { '2': [], '3': [], '4': [], '5': [] },
+        { '1': [], '2': [], '3': [], '4': [], '5': [] },
         JSON.parse(JSON.stringify(groupings)),
     );
 
@@ -33,24 +33,13 @@ const equalizeGroupings = (groupings: DiscountGroups) => {
     return groupingsCopy;
 };
 
-const getDiscountGroupings = (a: Array<Book>): DiscountGroups => {
-    const discounts: DiscountGroups = { '2': [], '3': [], '4': [], '5': [] };
-
-    const uniqA = [...new Set(a)];
-    if (uniqA.length === 1) {
-        return discounts;
-    }
-
-    const hasDuplicates = uniqA.length !== a.length;
-    if (!hasDuplicates) {
-        discounts[a.length] = [a];
-        return discounts;
-    }
+const getBookGroupings = (a: Array<Book>): BookGroupings => {
+    const discounts: BookGroupings = { '1': [], '2': [], '3': [], '4': [], '5': [] };
 
     const pool = [...a];
     let selectedValues: Array<Book> = [];
 
-    while (pool.length > 1) {
+    while (pool.length) {
         const curDiscount: Array<Book> = [];
 
         // make grouping
@@ -70,24 +59,22 @@ const getDiscountGroupings = (a: Array<Book>): DiscountGroups => {
         );
         selectedValues = [];
 
-        // it means no grouping
-        if (curDiscount.length === 1) {
-            break;
-        }
-
         // commit grouping
         discounts[curDiscount.length].push(curDiscount);
     }
+
     return discounts;
 };
 
-const getDiscount = (discountGroups: DiscountGroups): number => {
-    return Object.keys(discountGroups).reduce((acc, cur) => {
-        return (
-            acc +
-            discountGroups[cur].length * Number(cur) * BASE_BOOK_PRICE * DISCOUNTS[Number(cur)]
-        );
-    }, 0);
+const getDiscount = (BookGroupings: BookGroupings): number => {
+    return Object.keys(BookGroupings)
+        .filter((key) => key !== '1')
+        .reduce((acc, cur) => {
+            return (
+                acc +
+                BookGroupings[cur].length * Number(cur) * BASE_BOOK_PRICE * DISCOUNTS[Number(cur)]
+            );
+        }, 0);
 };
 
 const getBasePrice = (booksAmount: number) => booksAmount * BASE_BOOK_PRICE;
@@ -104,7 +91,7 @@ const getFinalPrice = (a: Array<Book>): number => {
     }
 
     const books = [...a].sort();
-    const curDiscount = getDiscountGroupings(books);
+    const curDiscount = getBookGroupings(books);
     const discount = getDiscount(equalizeGroupings(curDiscount));
 
     return basePrice - discount;
@@ -113,10 +100,10 @@ const getFinalPrice = (a: Array<Book>): number => {
 export {
     // types
     Book,
-    DiscountGroups,
+    BookGroupings,
     // main exports
     BASE_BOOK_PRICE,
     getFinalPrice,
-    getDiscountGroupings,
+    getBookGroupings,
     equalizeGroupings,
 };
